@@ -13,4 +13,5 @@ $activities = array_map(static function ($row) {
         'waktu' => date('d-m-Y H:i:s', strtotime($row['created_at'])),
     ];
 }, $rows);
-echo json_encode(['activities' => $activities], JSON_UNESCAPED_UNICODE);
+usort($activities, static fn($a,$b)=>strcmp($b['waktu'],$a['waktu']));
+echo json_encode(['activities' => array_slice($activities,0,8)], JSON_UNESCAPED_UNICODE);

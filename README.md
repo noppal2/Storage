@@ -1,4 +1,4 @@
-# StorageQR
+# STOKLY
 
 Aplikasi manajemen gudang berbasis QR Code dengan PHP native, MySQL/MariaDB, dan Bootstrap.
 
