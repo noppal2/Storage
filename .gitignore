@@ -1,3 +1,5 @@
 cloudflared.exe
 .sessions/
 .sessions_runtime/
+.chrome-profile/
+.edge-profile/

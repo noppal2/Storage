@@ -1,4 +1,5 @@
 <?php
+
 // Ubah kredensial ini sesuai konfigurasi MySQL Anda.
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'storage_qr');
