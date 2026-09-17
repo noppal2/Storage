@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
+// Mengambil transaksi berdasarkan periode lalu menampilkannya sebagai laporan.
 permission_only('reports_view');
 $periode = $_GET['periode'] ?? 'harian';
 if (!in_array($periode, ['harian','bulanan'], true)) {

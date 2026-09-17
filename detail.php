@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
+// Menampilkan detail barang atau unit berdasarkan kode dari URL/hasil pemindaian QR.
 if (logged_in()) {
     permission_any('barang_view', 'units_view');
 }

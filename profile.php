@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/bootstrap.php';
+// Memuat profil pengguna aktif dan memproses perubahan data atau password.
 require_login();
 
 $userId = (int)$_SESSION['user']['id'];
