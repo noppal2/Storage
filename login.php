@@ -1,11 +1,12 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
-echo '<script src="'.e(url('assets/password-toggle.js?v=2')).'"></script>';
+echo '<script src="'.e(url('assets/password-toggle.js?v=4')).'"></script>';
 if (logged_in()) {
     header('Location: '.url('index.php'));
     exit;
 }
 if (is_post()) {
+    // Memvalidasi kredensial dan menerapkan pembatasan percobaan login berdasarkan user serta IP.
     verify_csrf();
     $username = strtolower(trim($_POST['username'] ?? ''));
     $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
+// Mengambil dan menampilkan riwayat scan pengunjung ruangan terbaru.
 permission_only('room_log_view');
 $rows = $pdo->query('SELECT * FROM room_visits ORDER BY created_at DESC LIMIT 100')->fetchAll(PDO::FETCH_ASSOC);
 $_GET['page'] = 'room_logs';

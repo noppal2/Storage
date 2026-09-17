@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
+// Memvalidasi lokasi QR lalu mencatat kunjungan ruangan dari formulir.
 $locationId = (int)($_GET['lokasi'] ?? $_POST['lokasi_id'] ?? 0);
 $loginTarget = url('room_visit.php?lokasi='.$locationId);
 if (!logged_in()) {

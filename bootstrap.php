@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/config.php';
+// Menetapkan konfigurasi runtime yang berlaku untuk seluruh halaman aplikasi.
 date_default_timezone_set('Asia/Jakarta');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');
@@ -25,6 +26,7 @@ if (!isset($_SESSION['user'])) {
     $_SESSION['user'] = ['id' => 0, 'nama' => 'Guest', 'role' => 'guest'];
 }
 try {
+    // Membuka koneksi database lalu memastikan skema tambahan tetap kompatibel dengan instalasi lama.
     $pdo = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8mb4', DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     $pdo->exec("SET time_zone = '+07:00'");
     // Kolom kontak bersifat opsional agar akun lama tetap kompatibel.
@@ -91,12 +93,15 @@ try {
     }
     $pdo->exec('UPDATE barang b SET stok=(SELECT COUNT(*) FROM barang_unit bu WHERE bu.barang_id=b.id) WHERE b.aktif=1');
 } catch (PDOException $e) {
+    // Jangan menampilkan detail kredensial atau query database kepada pengguna.
     die('Koneksi database gagal. Jalankan install.php dan cek config.php.');
 }
+/** Mengamankan nilai sebelum ditampilkan sebagai HTML. */
 function e($v)
 {
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
+/** Membentuk URL internal berdasarkan BASE_URL atau lokasi script saat ini. */
 function url($path = '')
 {
     if (BASE_URL !== '') {
@@ -105,6 +110,7 @@ function url($path = '')
     $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/storage/index.php')), '/');
     return ($basePath === '.' ? '' : $basePath) . '/' . ltrim($path, '/');
 }
+/** Membentuk URL absolut yang dapat diakses perangkat lain di jaringan. */
 function public_url($path = '')
 {
     if (BASE_URL !== '') {
@@ -113,41 +119,50 @@ function public_url($path = '')
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     return $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . url($path);
 }
+/** Menghasilkan URL gambar QR untuk detail barang. */
 function qr_image_url($kode, $size = 300)
 {
     $target = public_url('detail.php?kode=' . rawurlencode($kode));
     return 'https://api.qrserver.com/v1/create-qr-code/?size=' . (int)$size . 'x' . (int)$size . '&format=png&data=' . rawurlencode($target);
 }
+/** Menghasilkan URL gambar QR untuk halaman kunjungan ruangan. */
 function room_qr_image_url($locationId, $size = 300)
 {
     $target = public_url('room_visit.php?lokasi=' . (int)$locationId);
     return 'https://api.qrserver.com/v1/create-qr-code/?size=' . (int)$size . 'x' . (int)$size . '&format=png&data=' . rawurlencode($target);
 }
+/** Mengecek apakah pengguna saat ini sudah login sebagai pengguna aktif. */
 function logged_in()
 {
     return isset($_SESSION['user']) && $_SESSION['user']['role'] !== 'guest';
 }
+/** Memvalidasi panjang dan kompleksitas minimal password. */
 function password_is_strong($password)
 {
     return strlen($password) >= 8 && preg_match('/[a-z]/', $password) && preg_match('/[A-Z]/', $password) && preg_match('/[0-9]/', $password);
 }
+/** Mengambil role pengguna dari session, atau guest jika belum login. */
 function current_role()
 {
     return $_SESSION['user']['role'] ?? 'guest';
 }
+/** Mengecek apakah pengguna saat ini memiliki role admin. */
 function is_admin()
 {
     return current_role() === 'admin';
 }
+/** Mengecek apakah pengguna saat ini memiliki role member. */
 function is_member()
 {
     return current_role() === 'user';
 }
+/** Mengubah kode role menjadi label yang ramah untuk tampilan. */
 function role_label($role = null)
 {
     $role = $role ?? current_role();
     return $role === 'admin' ? 'Admin' : ($role === 'user' ? 'Member' : 'Guest');
 }
+/** Mengharuskan pengguna login sebelum halaman dapat diproses. */
 function require_login()
 {
     if (!logged_in()) {
@@ -155,6 +170,7 @@ function require_login()
         exit;
     }
 }
+/** Membatasi akses admin atau izin khusus yang diberikan admin. */
 function admin_only()
 {
     require_login();
@@ -175,10 +191,12 @@ function admin_only()
     header('Location: '.url('index.php'));
     exit;
 }
+/** Mengembalikan daftar izin beserta label tampilannya. */
 function permission_names()
 {
     return ['dashboard_view' => 'Dashboard','barang_view' => 'Lihat data barang','units_view' => 'Lihat QR/unit','scan_view' => 'Scan QR Code barang','room_log_view' => 'Lihat log aktivitas ruangan','history_view' => 'Lihat riwayat','reports_view' => 'Lihat/cetak laporan','barang_manage' => 'Kelola barang','transaction_manage' => 'Kelola transaksi','category_manage' => 'Kelola kategori','location_manage' => 'Kelola lokasi'];
 }
+/** Mengecek izin langsung maupun izin lain yang mengimplikasikannya. */
 function has_permission($permission)
 {
     if (is_admin()) {
@@ -195,6 +213,7 @@ function has_permission($permission)
     }
     return has_direct_permission($permission);
 }
+/** Mengecek izin spesifik pengguna langsung dari tabel database. */
 function has_direct_permission($permission)
 {
     if (is_admin()) {
@@ -205,6 +224,7 @@ function has_direct_permission($permission)
     $s->execute([$_SESSION['user']['id'], $permission]);
     return (bool)$s->fetchColumn();
 }
+/** Menghentikan akses dan mengarahkan pengguna tanpa izin ke dashboard. */
 function permission_only($permission)
 {
     require_login();
@@ -214,6 +234,7 @@ function permission_only($permission)
         exit;
     }
 }
+/** Mengizinkan akses bila pengguna memiliki minimal satu dari beberapa izin. */
 function permission_any(...$permissions)
 {
     require_login();
@@ -226,10 +247,12 @@ function permission_any(...$permissions)
     header('Location: '.url('index.php'));
     exit;
 }
+/** Menyimpan pesan satu kali untuk ditampilkan pada request berikutnya. */
 function flash($type, $message)
 {
     $_SESSION['flash'] = [$type, $message];
 }
+/** Menampilkan lalu menghapus pesan flash dari session. */
 function show_flash()
 {
     if (!empty($_SESSION['flash'])) {
@@ -238,26 +261,31 @@ function show_flash()
         echo '<div class="alert alert-'.e($t).' alert-dismissible fade show">'.e($m).'<button class="btn-close" data-bs-dismiss="alert"></button></div>';
     }
 }
+/** Mengecek apakah request saat ini menggunakan metode POST. */
 function is_post()
 {
     return $_SERVER['REQUEST_METHOD'] === 'POST';
 }
+/** Mengambil atau membuat token CSRF untuk formulir. */
 function csrf()
 {
     if (empty($_SESSION['csrf'])) {
         $_SESSION['csrf'] = bin2hex(random_bytes(32));
     } return $_SESSION['csrf'];
 }
+/** Memastikan token CSRF pada request cocok dengan token session. */
 function verify_csrf()
 {
     if (!hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'] ?? '')) {
         die('Permintaan tidak valid.');
     }
 }
+/** Menggabungkan gedung, ruang, dan rak menjadi nama lokasi. */
 function location_name($x)
 {
     return trim(implode(' / ', array_filter([$x['gedung'] ?? '', $x['ruang'] ?? '', $x['rak'] ?? ''])));
 }
+/** Menghitung status tanggal kedaluwarsa dan kelas visualnya. */
 function expiry_status($date)
 {
     if (!$date) {
@@ -277,6 +305,7 @@ function expiry_status($date)
     }
     return ['label' => 'Berlaku', 'class' => 'success', 'days' => $days];
 }
+/** Memetakan status barang umum ke status unit individual. */
 function unit_status_from_barang_status($status)
 {
     $map = [
@@ -289,6 +318,7 @@ function unit_status_from_barang_status($status)
     ];
     return $map[$status] ?? 'tersedia';
 }
+/** Mengubah kode status unit menjadi label yang tampil kepada pengguna. */
 function unit_status_label($status)
 {
     return [
@@ -299,6 +329,7 @@ function unit_status_label($status)
     ][$status] ?? 'Tersedia';
 }
 
+/** Mencatat perubahan status unit beserta pengguna dan keterangannya. */
 function log_unit_status_change($unitId, $barangId, $oldStatus, $newStatus, $keterangan = null)
 {
     global $pdo;
@@ -308,6 +339,7 @@ function log_unit_status_change($unitId, $barangId, $oldStatus, $newStatus, $ket
     $pdo->prepare('INSERT INTO unit_status_logs(unit_id,barang_id,old_status,new_status,user_id,keterangan) VALUES(?,?,?,?,?,?)')->execute([$unitId,$barangId,$oldStatus,$newStatus,$_SESSION['user']['id'],$keterangan]);
 }
 
+/** Menyamakan jumlah unit individual dengan stok pada data barang utama. */
 function sync_barang_units($barangId, $kode, $targetStock, $barangStatus = 'Tersedia')
 {
     global $pdo;

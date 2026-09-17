@@ -205,6 +205,60 @@ body {
 .detail-edit-card h5 {
   margin-bottom: 1rem;
 }
+.transaction-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr);
+  gap: 1.5rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+body:has(.transaction-layout) .row.justify-content-center {
+  display: none;
+}
+.transaction-card,
+.transaction-help-card {
+  height: 100%;
+}
+.transaction-icon {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  flex: 0 0 2.6rem;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.transaction-help-card {
+  background: #f8fbff;
+}
+.transaction-rule {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.transaction-rule:last-of-type {
+  margin-bottom: 1rem;
+}
+.transaction-rule b,
+.transaction-rule small {
+  display: block;
+}
+.transaction-rule small {
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+.transaction-rule-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex: 0 0 0.7rem;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+}
 .password-toggle {
   min-width: 46px;
   display: inline-flex;
@@ -359,6 +413,13 @@ body {
   }
   .scanner .card-body {
     padding: 1.35rem;
+  }
+  .transaction-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .transaction-help-column {
+    order: 2;
   }
   .detail-edit-card .card-body {
     padding: 1rem;
@@ -1772,6 +1833,111 @@ body:has(a[href*="laporan.php?periode=harian"])
     > div:last-child {
     width: 100%;
     justify-content: flex-end;
+  }
+}
+
+/* History toolbar: keep filters and report actions balanced across viewports. */
+.history-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem;
+  border: 1px solid #dbe5f5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 20px #153b7a0e;
+}
+.history-filters,
+.history-reports,
+.history-month-form {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
+}
+.history-filters .form-select {
+  width: 180px;
+}
+.history-filters .form-control {
+  width: 190px;
+}
+.history-filters .form-select,
+.history-filters .form-control,
+.history-filters .btn,
+.history-reports .btn,
+.history-month-form .form-control {
+  min-height: 42px;
+}
+.history-filters .btn {
+  white-space: nowrap;
+}
+.history-reports {
+  justify-content: flex-end;
+}
+.history-month-form .form-control {
+  width: 170px;
+}
+.history-reports .btn,
+.history-month-form .btn {
+  white-space: nowrap;
+}
+@media (max-width: 991.98px) {
+  .history-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .history-reports {
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 767.98px) {
+  .history-toolbar {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .history-filters,
+  .history-reports {
+    width: 100%;
+  }
+  .history-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .history-filters .form-select,
+  .history-filters .form-control,
+  .history-filters .btn {
+    width: 100%;
+  }
+  .history-filters .btn {
+    grid-column: 1 / -1;
+  }
+  .history-reports {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .history-reports > .btn,
+  .history-month-form,
+  .history-month-form .form-control,
+  .history-month-form .btn {
+    width: 100%;
+  }
+  .history-month-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  }
+}
+@media (max-width: 420px) {
+  .history-filters {
+    grid-template-columns: 1fr;
+  }
+  .history-filters .btn {
+    grid-column: auto;
+  }
+  .history-month-form {
+    grid-template-columns: 1fr;
   }
 }
 @media (min-width: 1200px) {

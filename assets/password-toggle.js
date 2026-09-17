@@ -66,7 +66,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelectorAll('input[type="password"]').forEach(function (input) {
     let group = input.closest('.input-group');
-    let button = group?.querySelector('.password-toggle, [data-password-toggle], #toggle-login-password');
+    let button = input.id
+      ? document.querySelector('[data-password-toggle-for="' + input.id + '"]')
+      : null;
+    button = button || group?.querySelector('.password-toggle, [data-password-toggle], #toggle-login-password');
 
     if (!group) {
       group = document.createElement('div');
@@ -87,12 +90,18 @@ document.addEventListener('DOMContentLoaded', function () {
     button.setAttribute('aria-label', 'Tampilkan password');
     button.setAttribute('title', 'Tampilkan password');
 
+    const targetId = button.getAttribute('data-password-toggle-for');
+    if (targetId && document.getElementById(targetId) !== input) {
+      return;
+    }
+
     if (button.id === 'toggle-login-password' || button.dataset.passwordToggleBound) {
       return;
     }
 
     button.dataset.passwordToggleBound = '1';
-    button.addEventListener('click', function () {
+    button.addEventListener('click', function (event) {
+      event.stopImmediatePropagation();
       const visible = input.type === 'password';
 
       input.type = visible ? 'text' : 'password';

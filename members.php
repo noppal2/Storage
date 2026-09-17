@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__.'/bootstrap.php';
-echo '<script src="'.e(url('assets/password-toggle.js?v=2')).'"></script>';
+echo '<script src="'.e(url('assets/password-toggle.js?v=4')).'"></script>';
+echo '<script>document.addEventListener("DOMContentLoaded",function(){const first=document.getElementById("permission-dashboard_view");if(!first)return;const form=first.form,boxes=[...form.querySelectorAll("input[name=\"permissions[]\"]")];if(!boxes.length)return;const wrapper=document.createElement("div");wrapper.className="form-check mb-2";const all=document.createElement("input");all.type="checkbox";all.className="form-check-input";all.id="select-all-member-permissions";const label=document.createElement("label");label.className="form-check-label fw-semibold";label.htmlFor=all.id;label.textContent="Pilih semua izin";wrapper.append(all,label);first.closest(".border")?.before(wrapper);const sync=function(){all.checked=boxes.every(function(box){return box.checked});all.indeterminate=!all.checked&&boxes.some(function(box){return box.checked})};all.addEventListener("change",function(){boxes.forEach(function(box){box.checked=all.checked});sync()});boxes.forEach(function(box){box.addEventListener("change",sync)});sync()});</script>';
 admin_only();
 
 function save_user_permissions($userId, $role, $selected)
 {
+    // Mengganti seluruh izin pengguna agar perubahan formulir tersimpan konsisten.
     global $pdo;
     $pdo->prepare('DELETE FROM user_permissions WHERE user_id=?')->execute([$userId]);
     if ($role !== 'user') {

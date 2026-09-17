@@ -28,6 +28,7 @@ if ($periode === 'harian') {
 $statement = $pdo->prepare($sql);
 $statement->execute($params);
 $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+// Menghitung ringkasan transaksi untuk ditampilkan pada bagian laporan.
 $masuk = 0;
 $keluar = 0;
 foreach ($rows as $row) {
@@ -40,6 +41,7 @@ foreach ($rows as $row) {
 
 function pdf_clean($text, $limit = 80)
 {
+    // Membersihkan teks dan mengonversinya ke encoding yang didukung PDF sederhana ini.
     $text = strip_tags((string) $text);
     $text = preg_replace('/\s+/', ' ', $text);
     $text = iconv('UTF-8', 'Windows-1252//TRANSLIT//IGNORE', $text) ?: '';
@@ -47,6 +49,7 @@ function pdf_clean($text, $limit = 80)
 }
 function pdf_text($x, $y, $text, $size = 9, $bold = false)
 {
+    // Membuat instruksi PDF untuk menulis satu potong teks pada koordinat tertentu.
     $font = $bold ? 'F2' : 'F1';
     $text = str_replace(['StorageQR', 'Storage QR'], 'STOKLY', (string) $text);
     $text = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], pdf_clean($text));
@@ -54,14 +57,17 @@ function pdf_text($x, $y, $text, $size = 9, $bold = false)
 }
 function pdf_line($x1, $y1, $x2, $y2)
 {
+    // Membuat instruksi garis untuk pemisah atau tabel laporan.
     return "$x1 $y1 m $x2 $y2 l S\n";
 }
 function pdf_fill($r, $g, $b, $x, $y, $width, $height)
 {
+    // Membuat instruksi persegi berwarna untuk latar atau header laporan.
     return "$r $g $b rg\n$x $y $width $height re f\n";
 }
 function pdf_document($pages)
 {
+    // Merakit halaman dan objek PDF mentah beserta tabel referensi silang.
     $objects = [1 => '<< /Type /Catalog /Pages 2 0 R >>',3 => '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',4 => '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'];
     $pageIds = [];
     $next = 5;

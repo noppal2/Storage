@@ -8,6 +8,7 @@ $search = trim($_GET['q'] ?? '');
 $locations = $pdo->query('SELECT * FROM lokasi ORDER BY gedung,ruang,rak')->fetchAll(PDO::FETCH_ASSOC);
 function unit_options($rows, $selected)
 {
+    // Menampilkan daftar lokasi sebagai opsi dropdown pada formulir unit.
     foreach ($rows as $row) {
         echo '<option value="'.e($row['id']).'" '.($selected == $row['id'] ? 'selected' : '').'>'.e(location_name($row)).'</option>';
     }
